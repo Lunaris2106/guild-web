@@ -167,7 +167,7 @@ export default function App() {
               {modalConfig.options.map(o => (
                 <button 
                   key={o.value} 
-                  className={`border border-black/20 dark:border-white/20 p-3 text-sm font-bold text-center transition-colors hover:bg-black hover:text-white dark:hover:bg-white dark:hover:text-black truncate ${o.colorClass || ''}`}
+                  className={`border border-black/20 dark:border-white/20 p-2 text-sm font-bold text-center transition-colors hover:bg-black hover:text-white dark:hover:bg-white dark:hover:text-black min-h-[48px] flex items-center justify-center break-words leading-tight ${o.colorClass || ''}`}
                   onClick={() => {
                     if(modalConfig.onSelect) modalConfig.onSelect(o.value);
                     closeModal();
@@ -353,10 +353,10 @@ function KingdomPage({ apiCall, metadata }) {
     return sortableItems;
   }, [data, sortConfig]);
 
-  const Th = ({ label, sortKey, align='left' }) => (
+  const Th = ({ label, sortKey, align='left', colorClass='' }) => (
     <th 
       onClick={() => sortKey && handleSort(sortKey)}
-      className={`py-2 px-1 md:px-2 text-[11px] md:text-sm font-bold tracking-wider whitespace-nowrap border-b border-black dark:border-white text-${align} ${sortKey ? 'cursor-pointer hover:opacity-60' : ''}`}
+      className={`py-2 px-1 md:px-2 text-[11px] md:text-sm font-bold tracking-wider whitespace-nowrap border-b border-black dark:border-white text-${align} ${sortKey ? 'cursor-pointer hover:opacity-60' : ''} ${colorClass}`}
     >
       {label} {sortConfig.key === sortKey ? (sortConfig.direction === 'asc' ? '▲' : '▼') : ''}
     </th>
@@ -385,8 +385,8 @@ function KingdomPage({ apiCall, metadata }) {
                   <Th label="전투력" sortKey="cp" align="right" />
                 </>
               )}
-              {view === 'familiar' && reqFamiliars.map(f => <Th key={f} label={f} />)}
-              {view === 'skill' && reqSkills.map(s => <Th key={s} label={s} />)}
+              {view === 'familiar' && reqFamiliars.map(f => <Th key={f} label={f} colorClass={getAttrColor(f, metadata)} />)}
+              {view === 'skill' && reqSkills.map(s => <Th key={s} label={s} colorClass={getAttrColor(s, metadata)} />)}
             </tr>
           </thead>
           <tbody>
@@ -401,10 +401,10 @@ function KingdomPage({ apiCall, metadata }) {
                   </>
                 )}
                 {view === 'familiar' && reqFamiliars.map(f => (
-                  <td key={f} className="py-2 px-1 md:px-2 whitespace-nowrap font-bold opacity-80">{row.data[f] || '-'}</td>
+                  <td key={f} className={`py-2 px-1 md:px-2 whitespace-nowrap font-bold opacity-90 ${getAttrColor(f, metadata)}`}>{row.data[f] || '-'}</td>
                 ))}
                 {view === 'skill' && reqSkills.map(s => (
-                  <td key={s} className="py-2 px-1 md:px-2 whitespace-nowrap font-bold opacity-80">{row.data[s] || '-'}</td>
+                  <td key={s} className={`py-2 px-1 md:px-2 whitespace-nowrap font-bold opacity-90 ${getAttrColor(s, metadata)}`}>{row.data[s] || '-'}</td>
                 ))}
               </tr>
             ))}
@@ -468,32 +468,32 @@ function PersonalPage({ user, setUser, userData, setUserData, userLogs, setUserL
           )}
         </div>
         
-        {/* 모바일에서도 조밀한 4열(2쌍) 유지 */}
-        <div className="grid grid-cols-[auto_minmax(50px,80px)_auto_minmax(50px,80px)] md:grid-cols-[auto_minmax(60px,100px)_auto_minmax(60px,100px)_auto_minmax(60px,100px)] gap-x-2 md:gap-x-6 gap-y-4 items-center justify-start">
+        {/* 중앙 정렬된 2쌍(4열) 레이아웃 */}
+        <div className="grid grid-cols-2 gap-x-2 md:gap-x-8 gap-y-5">
           {displayedItems.map(m => (
-            <React.Fragment key={m.item_name}>
+            <div key={m.item_name} className="flex items-center justify-center gap-2 md:gap-4 w-full">
               {/* LABEL */}
-              <div className={`text-xs md:text-sm font-bold flex items-center gap-1 ${getAttrColor(m.item_name, metadata)} whitespace-nowrap`}>
-                <span>{m.item_name}</span>
+              <div className={`flex-1 flex justify-end items-center text-[11px] md:text-sm font-bold whitespace-nowrap ${getAttrColor(m.item_name, metadata)}`}>
                 {Number(m.basic) === 0 && (
                   <button onClick={() => {
                     const newTemp = {...tempData};
                     delete newTemp[m.item_name];
                     setTempData(newTemp);
-                  }} className="text-red-500 font-bold ml-1 opacity-40 hover:opacity-100"><X size={12}/></button>
+                  }} className="text-red-500 font-bold opacity-40 hover:opacity-100 mr-1"><X size={12}/></button>
                 )}
+                <span>{m.item_name}</span>
               </div>
               {/* INPUT */}
-              <div>
+              <div className="flex-1 flex justify-start">
                 <input 
                   type="text" 
                   value={tempData[m.item_name] || ''} 
                   onChange={(e) => handleInput(m.item_name, e.target.value)} 
                   placeholder="-" 
-                  className="w-full bg-transparent border-b border-black/30 dark:border-white/30 text-xs md:text-sm px-1 py-1 focus:outline-none focus:border-black dark:focus:border-white transition-colors" 
+                  className="w-16 md:w-24 bg-transparent border-b border-black/30 dark:border-white/30 text-xs md:text-sm px-1 py-1 focus:outline-none focus:border-black dark:focus:border-white transition-colors text-center" 
                 />
               </div>
-            </React.Fragment>
+            </div>
           ))}
         </div>
       </div>
