@@ -4,7 +4,7 @@ import { Sun, Moon, Menu, X, ChevronRight, LogOut, Trash2 } from 'lucide-react';
 // ==========================================
 // CONFIGURATION
 // ==========================================
-const API_URL = "https://script.google.com/macros/s/AKfycbzzfy5fOgQGtQ5dd_0ASxh_dINcecR778vCFerrgZh97P78d7FhTOGcYj2yxD1F4eQ/exec"; 
+const API_URL = "https://script.google.com/macros/s/AKfycbzVZDWkXCiBEUDZxe-ApSH8X3M-BdylNHOjbvIiiUnMsuQHX4c_gJP032zb2jUbjUU/exec"; 
 
 const ATTR_COLORS = {
   '불': 'text-red-500 dark:text-red-400 font-bold',
