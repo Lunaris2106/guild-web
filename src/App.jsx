@@ -245,7 +245,7 @@ export default function App() {
             />
           ) : (
             <>
-              {page === 'kingdom' && <KingdomPage apiCall={apiCall} metadata={metadata} familiarData={familiarData} />}
+              {page === 'kingdom' && <KingdomPage apiCall={apiCall} metadata={metadata} />}
               {page === 'personal' && (
                 <PersonalPage 
                   user={user} setUser={setUser}
@@ -437,7 +437,6 @@ function PersonalPage({ user, setUser, userData, setUserData, userLogs, setUserL
   const [tab, setTab] = useState('능력치');
   const [tempData, setTempData] = useState(userData);
 
-  // 다이나믹 탭 생성
   const myTabs = ['능력치', '이마젠', '공용 패시브 스킬', '공용 액티브 스킬'];
   if (user.job) myTabs.push(`${user.job} 전용 스킬`);
   myTabs.push('점수', '덱 설정', '통계');
@@ -460,10 +459,9 @@ function PersonalPage({ user, setUser, userData, setUserData, userLogs, setUserL
       }
     });
 
-    // 삭제된 항목 처리
     Object.keys(userData).forEach(key => {
       if (tempData[key] === undefined && metadata.find(m => m.item_name === key && m.category !== 'score_type')) {
-         logsToSave.push({ item: key, value: '' }); // 서버에서 빈 문자열 받으면 삭제 처리하도록 (또는 별도 처리)
+         logsToSave.push({ item: key, value: '' }); 
       }
     });
 
@@ -476,7 +474,6 @@ function PersonalPage({ user, setUser, userData, setUserData, userLogs, setUserL
     }
   };
 
-  // --- 스킬, 능력치 공용 렌더링 함수 (표 형태) ---
   const renderTableSection = (category, title) => {
     const items = metadata.filter(m => m.category === category);
     if (items.length === 0) return null;
@@ -568,18 +565,16 @@ function PersonalPage({ user, setUser, userData, setUserData, userLogs, setUserL
     );
   };
 
-  // --- 이마젠 전용 렌더링 함수 ---
   const renderFamiliarSection = () => {
     const familiarMeta = metadata.filter(m => m.category === 'familiar');
     const addableItems = familiarMeta.filter(m => Number(m.basic) === 0 && tempData[m.item_name] === undefined);
 
+    // [버그 수정됨] 0이 false로 처리되지 않도록 String 변환
     const getPowerLevel = (val) => {
-      // 값이 없거나 'X'인 경우 (숫자 0은 정상 값이므로 통과시킴)
-      if (val === undefined || val === null || val === '' || val === 'X') return 'X';
+      if (val === undefined || val === null || val === '') return 'X';
+      const strVal = String(val).trim();
       
-      // 구글 시트에서 숫자(1, 2 등)로 들어오더라도 에러가 나지 않도록 무조건 문자로 변환
-      const strVal = String(val);
-      
+      if (strVal === 'X') return 'X';
       if (strVal.startsWith('초극')) return '초극';
       if (strVal.startsWith('초')) return '초월';
       return '일반';
@@ -593,26 +588,31 @@ function PersonalPage({ user, setUser, userData, setUserData, userLogs, setUserL
 
       if (!familiarData || familiarData.length === 0) return defaultOptions;
 
-      const fd = familiarData.filter(d => d.familiar === itemName);
-      if(fd.length === 0) return defaultOptions; // 데이터 없으면 전체 오픈
+      // 공백 이슈 방지를 위해 모두 trim() 적용
+      const fd = familiarData.filter(d => String(d.familiar).trim() === String(itemName).trim());
+      if(fd.length === 0) return defaultOptions; 
 
       const options = ['X'];
-      if (fd.some(d => d.power === '일반' && d.url)) {
+      if (fd.some(d => String(d.power).trim() === '일반' && d.url)) {
         for(let i=0; i<=10; i++) options.push(i.toString());
       }
-      if (fd.some(d => d.power === '초월' && d.url)) {
+      if (fd.some(d => String(d.power).trim() === '초월' && d.url)) {
         for(let i=1; i<=10; i++) options.push(`초${i}`);
       }
-      if (fd.some(d => d.power === '초극' && d.url)) {
+      if (fd.some(d => String(d.power).trim() === '초극' && d.url)) {
         for(let i=1; i<=10; i++) options.push(`초극${i}`);
       }
       return options;
     };
 
+    // 공백 이슈 방지를 위해 모두 trim() 적용하여 매칭
     const getFamiliarImageUrl = (itemName, powerLevel) => {
       if (!familiarData || familiarData.length === 0) return '';
-      const record = familiarData.find(d => d.familiar === itemName && d.power === powerLevel);
-      return record && record.url ? record.url : '';
+      const record = familiarData.find(d => 
+        String(d.familiar).trim() === String(itemName).trim() && 
+        String(d.power).trim() === String(powerLevel).trim()
+      );
+      return record && record.url ? String(record.url).trim() : '';
     };
 
     return (
@@ -646,7 +646,7 @@ function PersonalPage({ user, setUser, userData, setUserData, userLogs, setUserL
                 <h4 className={`text-sm md:text-base font-bold mb-2 tracking-widest ${ATTR_COLORS[attr]}`}>{attr} 속성</h4>
                 <div className="grid grid-cols-4 border-t border-l border-black dark:border-white bg-white dark:bg-[#111]">
                   {displayedItems.map(m => {
-                    const val = tempData[m.item_name] || 'X';
+                    const val = tempData[m.item_name] !== undefined ? tempData[m.item_name] : 'X';
                     const powerLevel = getPowerLevel(val);
                     const imgUrl = getFamiliarImageUrl(m.item_name, powerLevel);
                     const options = getFamiliarOptions(m.item_name);
