@@ -574,9 +574,14 @@ function PersonalPage({ user, setUser, userData, setUserData, userLogs, setUserL
     const addableItems = familiarMeta.filter(m => Number(m.basic) === 0 && tempData[m.item_name] === undefined);
 
     const getPowerLevel = (val) => {
-      if (!val || val === 'X') return 'X';
-      if (val.startsWith('초극')) return '초극';
-      if (val.startsWith('초')) return '초월';
+      // 값이 없거나 'X'인 경우 (숫자 0은 정상 값이므로 통과시킴)
+      if (val === undefined || val === null || val === '' || val === 'X') return 'X';
+      
+      // 구글 시트에서 숫자(1, 2 등)로 들어오더라도 에러가 나지 않도록 무조건 문자로 변환
+      const strVal = String(val);
+      
+      if (strVal.startsWith('초극')) return '초극';
+      if (strVal.startsWith('초')) return '초월';
       return '일반';
     };
 
