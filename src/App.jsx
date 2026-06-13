@@ -5,7 +5,7 @@ import React from 'react';
 // ==========================================
 // CONFIGURATION
 // ==========================================
-const API_URL = "https://script.google.com/macros/s/AKfycbztH4m-WABagaLwVGEyl-NXLsyJ0PvICWkcOhOHf0L8JSNohSBhQqTAFcpdPOsHXJ1c/exec"; 
+const API_URL = "https://script.google.com/macros/s/AKfycbwzJC9fhOddcoOgYesXhA7SLyMP9qzaa1rZ_h_rE016B0CvAcdZCHB9PyscuAtKRPhA/exec"; 
 
 const ATTR_COLORS = {
   '불': 'text-red-600 dark:text-red-400 font-bold',
